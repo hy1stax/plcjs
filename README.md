@@ -1,6 +1,7 @@
 # plcjs
 A plc online check for nodejs. Feasible for displaing plc or IoT devide in any browser.
 Unlike traditional c/s software, requires update the client.
+The example of the reponse is a Panasonic FP-X PLC.
 
 Require package: serial port.
 
