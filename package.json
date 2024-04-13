@@ -1,0 +1,15 @@
+{
+  "name": "plcjs",
+  "version": "1.0.0",
+  "description": "A serial communication tool, use for IoT online status check.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": ["plc","IoT","Panasonic plc"],
+  "author": "luweizhao09@gmail.com",
+  "license": "ISC",
+  "dependencies": {
+    "serialport": "^12.0.0"
+  }
+}
