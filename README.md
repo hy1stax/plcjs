@@ -6,6 +6,7 @@ Require package: serial port.
 
 //List ports
 listports();
+
 //use example
 checkOnLine("COM2",9600);
 
