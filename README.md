@@ -1,16 +1,15 @@
-# plcjs
-A plc online check for nodejs. Feasible for displaing plc or IoT devide in any browser.
-Unlike traditional c/s software, requires update the client.
-The example of the reponse is a Panasonic FP-X PLC.
+# Install
 
-Require package: serial port.
+This is a lib for plc communication.<br>
+Currently is support panasonic plc, will add omron plc later on.<br>
+Install via npm<br>
+npm i plcjs<br>
 
-//List ports
+# Usage
+The lib offers a serial command, you could send code via serial, ether port, even remote serial port.<br>
 
-listports();
-
-//use example
-
-checkOnLine("COM2",9600);
-
-Will add more function in the following.
+`
+const panasonic = require("../plcjs");
+a = new panasonic;
+console.log(a.PanasonicVer());
+`

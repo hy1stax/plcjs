@@ -1,50 +1,137 @@
-const { SerialPort } = require('serialport');
+//Lib for plc communication
+//First case is panasonic plc, following is omron
 
-//Online contex, define your online marks
-//Usually the online mark is a string that defined by IoT devices
-//Check you operation manual for detail.
-//This case is a Panasonic PLC, fp-x seris, check online
-const onlineMark = "%01$RT20253281004000000F"+"\r"
-
-//Listing system avaliable ports.
-async function listports() {
-  const ports = await SerialPort.list();
-  console.log(ports.map(port => port.path + ":" + port.friendlyName).join("\n"));
-}
-
-//Modify the function to fitting your uses
-async function checkOnLine(portNum, rate){
-  const port = new SerialPort({ path: portNum, baudRate:rate, autoOpen: false });
-  
-  port.on('error', err => {
-    console.log('There is an error: ' + err.message + "\n");
-  });
-  
-  port.on('data', data => {
-    console.log('Data received: ' + data + "\n");
-    if(data == onlineMark){
-      console.log("The device is online.")
-    }
-  });
-  
-  port.open(function (err) {
-    if (err) {
-      console.log('Port open fail: ' + err.message + "\n");
+//Panasonic PLC code here
+class panasonic{
+  //Validate input for panasonic plc
+  PanFormatChk(inputs)
+  {
+    let result = false;
+    if (inputs == null)
+    {
+      console.log("Input incorrect, a parameter required, example PanSwitchOn('X0000').");
       return;
     }
-    console.log(portNum + ' open sucesses, now sending a greeting message' + "\r");
-    
-    //Greeting message defination
-    try {
-      port.write("%01#RT**"+ "\r");
-      console.log("The message has sent." + "\n")
-    }catch (err) {
-      console.log('Message send fail: ' + err.message+'\n');
+    result = false;
+    if (len(inputs) != 5)
+    {
+      console.log("Input incorrect, the correct should be like R0001, 5 chars.");
+      return;
+    }else
+    {
+      let pattern = /^[RXYT]\d{4}$/;
+      if(pattern.test(inputs))
+      {
+        result = true;
+      }else
+      {
+        console.log("Input incorrect, the relay should be X,Y,T,R, follow by four char. ex: R0001");
+      }
     }
-  });
+    return result;
+  }
+
+  //Panasonic PLC communication, check version.
+  PanasonicVer(){
+      return "%EE#RT**"+ "\r";
+  }
+
+  //Swtich on a contact
+  PanSwitchOn(contact)
+  {
+    if(!PanFormatChk(contact))
+    {
+      return;
+    }
+    return "%EE#WCS"+contact+"1**"+"\r";
+  }
+
+  //Switch off a contact
+  PanSwitchOff(contact)
+  {
+    if(!PanFormatChk(contact))
+    {
+      return;
+    }
+    return "%EE#WCS"+contact+"1**"+"\r";
+  }
+
+  //Switch on a range of contacts
+  PanSWMultiOn(start,end)
+  {
+    if(start == null || end == null)
+    {
+      console.log("Input incorrect, two parameter required, example PanSWMultiOn('X0000','X0009').");
+      return;
+    }
+    if(!PanFormatChk(start) || !PanFormatChk(start))
+    {
+      return;
+    }
+    return"%EE#WCP"+start+end+"1**"+"\r";
+  }
+
+  //Switch off a range of contacts
+  PanSWMultiOff(start,end)
+  {
+    if(start == null || end == null)
+    {
+      console.log("Input incorrect, two parameter required, example PanSWMultiOn('X0000','X0009').");
+      return;
+    }
+    if(!PanFormatChk(start) || !PanFormatChk(start))
+    {
+      return;
+    }
+    return"%EE#WCP"+start+end+"0**"+"\r";
+  }
+
+  //Read a contact status
+  PanReadSingle(contact)
+  {
+    if(!PanFormatChk(contact))
+    {
+      return;
+    }
+    return "%EE#RCS"+contact+"**"+"\r";
+  }
+
+  //Read a range contacts status
+  PanReadMulti(start,end)
+  {
+    if(start == null || end == null)
+    {
+      console.log("Input incorrect, two parameter required, example PanSWMultiOn('X0000','X0009').");
+      return;
+    }
+    if(!PanFormatChk(start) || !PanFormatChk(start))
+    {
+      return;
+    }
+    return "%EE#RCP" + start + end + "**" + "\r"
+  }
+
+  //Read register
+  PanReadDT(start, end)
+  {
+    if(start == null || end == null)
+    {
+      console.log("Input incorrect, two parameter required, example PanSWMultiOn('X0000','X0009').");
+      return;
+    }
+    if(start == null || end == null)
+    {
+      console.log("Missing parameter, there are two parameters, example: PanReadDT(0001,1234)");
+      return;
+    }
+    let pattern = /^[0-9]+$/;
+    if(!pattern.test(start) || !pattern.test(end))
+    {
+      console.log("Input incorrect, please input 4 digit each, example: PanReadDT(0001,1234)");
+      return;
+    }
+    return "%EE#RDD"+str(Start)+str(End)+"**"+"\r"
+  }
 }
 
-//List ports
-listports();
-//use example
-checkOnLine("COM2",9600);
+module.exports = panasonic;
