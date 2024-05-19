@@ -11,6 +11,7 @@ The lib offers a serial command, you could send code via serial, ether port, eve
 
 `const panasonic = require("../plcjs");`<br>
 `a = new panasonic;`<br>
+`//Show the command that you planed to write`
 `console.log(a.PanasonicVer());`<br>
 
 You could see the output of the mewtocol command string. And use this string sent to PLC via serial port or TCP etc.
